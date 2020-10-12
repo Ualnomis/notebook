@@ -6,7 +6,7 @@
 <!-- 2020-10-12 Mon 19:40 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>logrus</title>
+<title>mysql</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="刘尚亮" />
 <style type="text/css">
@@ -306,200 +306,183 @@ for the JavaScript code in this tag.
  |
  <a accesskey="H" href="https://phenix3443.github.io/"> HOME </a>
 </div><div id="content">
-<h1 class="title">logrus</h1>
+<h1 class="title">mysql</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org7489f05">1. 简介</a></li>
-<li><a href="#orgee79bae">2. 优点</a></li>
-<li><a href="#orgaf78211">3. 缺点</a></li>
-<li><a href="#org1168553">4. 示例</a>
+<li><a href="#org742e1e5">1. 概述</a></li>
+<li><a href="#orgc9dc35f">2. 导入</a></li>
+<li><a href="#org4328e0e">3. 连接数据库</a></li>
+<li><a href="#orge1ae6ab">4. 增删改</a></li>
+<li><a href="#orgd24979d">5. 查询</a>
 <ul>
-<li><a href="#org3df9a4f">4.1. 标准 logger</a></li>
-<li><a href="#org13bfe94">4.2. 自定义 logger</a></li>
-<li><a href="#org46fd2ca">4.3. entry</a></li>
-<li><a href="#org9c29aab">4.4. hook</a></li>
+<li><a href="#org31cb421">5.1. 单行</a></li>
+<li><a href="#org51a39c3">5.2. 多行</a></li>
 </ul>
 </li>
-<li><a href="#orgb9f158f">5. 注意事项</a></li>
+<li><a href="#org2271ce8">6. 事务</a></li>
+<li><a href="#org6e0c064">7. Null 处理</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org7489f05" class="outline-2">
-<h2 id="org7489f05"><span class="section-number-2">1</span> 简介</h2>
+<div id="outline-container-org742e1e5" class="outline-2">
+<h2 id="org742e1e5"><span class="section-number-2">1</span> 概述</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-logrus 是一个日志记录工具，核心思想是日志的记录应该是结构化的，而只是记录一个字符串。
+<a href="https://github.com/go-sql-driver/mysql">mysql</a> : golang 中的数据库主要是用到了 database/sql 包，但是这个包指示提供了 sql 的操作接口，具体的 sql 驱动还需要额外的包提供，比如 github.com/go-sql-driver/mysql。
 </p>
 </div>
 </div>
 
-<div id="outline-container-orgee79bae" class="outline-2">
-<h2 id="orgee79bae"><span class="section-number-2">2</span> 优点</h2>
+<div id="outline-container-orgc9dc35f" class="outline-2">
+<h2 id="orgc9dc35f"><span class="section-number-2">2</span> 导入</h2>
 <div class="outline-text-2" id="text-2">
-<ul class="org-ul">
-<li><p>
-线程安全
+<div class="org-src-container">
+<pre class="src src-go"><span style="color: #00ffff; font-weight: bold;">import</span> (
+    <span style="color: #00ff00;">"database/sql"</span>
+    _ <span style="color: #00ff00;">"github.com/go-sql-driver/mysql"</span>
+)
+</pre>
+</div>
+<p>
+分别导入 sql 操作接口和 mysql 驱动。
 </p>
+</div>
+</div>
+<div id="outline-container-org4328e0e" class="outline-2">
+<h2 id="org4328e0e"><span class="section-number-2">3</span> 连接数据库</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+<pre class="src src-go"><span style="color: #ffff00;">dsn</span> := <span style="color: #00ff00;">"root:toor@tcp(127.0.0.1:3306)/touch_manager"</span>
+<span style="color: #ffff00;">db</span>, <span style="color: #ffff00;">err</span> := sql.<span style="color: #0000ff; font-weight: bold;">Open</span>(<span style="color: #00ff00;">"mysql"</span>, dsn)
+<span style="color: #00ffff; font-weight: bold;">if</span> err != <span style="color: #ff00ff;">nil</span> {
+    fmt.<span style="color: #0000ff; font-weight: bold;">Println</span>(err.<span style="color: #0000ff; font-weight: bold;">Error</span>())
+}
+
+<span style="color: #00ffff; font-weight: bold;">if</span> <span style="color: #ffff00;">ok</span> := db.<span style="color: #0000ff; font-weight: bold;">Ping</span>(); ok == <span style="color: #ff00ff;">nil</span> {
+    <span style="color: #0000ff; font-weight: bold;">println</span>(<span style="color: #00ff00;">"db still alive"</span>)
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-go"><span style="color: #00ffff; font-weight: bold;">func</span> <span style="color: #0000ff; font-weight: bold;">Open</span>(<span style="color: #ffff00;">driverName</span>, <span style="color: #ffff00;">dataSourceName</span> <span style="color: #00ff00;">string</span>) (*<span style="color: #00ff00;">DB</span>, <span style="color: #00ff00;">error</span>)
+</pre>
+</div>
 
 <p>
-通过 sync.Mutex 的方式每次对 Logger 进行加锁，获得锁后写入单条日志，然后释放锁。
-</p></li>
+DB 对象代表了和数据数据库的连接池。sql 包会自动创建和释放链接。   open 接口仅验证参数是否正确，并不会创建和数据库的链接。为了确认可以进行链接，需要调用 Ping 命令。
+</p>
+</div>
+</div>
 
-<li>支持不同的日志等级。</li>
+<div id="outline-container-orge1ae6ab" class="outline-2">
+<h2 id="orge1ae6ab"><span class="section-number-2">4</span> 增删改</h2>
+<div class="outline-text-2" id="text-4">
+<div class="org-src-container">
+<pre class="src src-go"><span style="color: #ffff00;">res</span>, <span style="color: #ffff00;">err</span> := db.<span style="color: #0000ff; font-weight: bold;">Exec</span>(<span style="color: #00ff00;">"replace into touch_rule values (?,?);"</span>, 1, <span style="color: #00ff00;">"test"</span>)
+<span style="color: #00ffff; font-weight: bold;">if</span> err != <span style="color: #ff00ff;">nil</span> {
+    log.<span style="color: #0000ff; font-weight: bold;">Fatal</span>(err)
+}
+<span style="color: #ffff00;">id</span>, <span style="color: #ffff00;">_</span> := res.<span style="color: #0000ff; font-weight: bold;">LastInsertId</span>()
+<span style="color: #ffff00;">count</span>, <span style="color: #ffff00;">_</span> := res.<span style="color: #0000ff; font-weight: bold;">RowsAffected</span>()
+</pre>
+</div>
+<p>
+(*DB).Exec 处理不需要任何返回的查询，例如 INSERT, UPDATE, DELETE。
+</p>
+</div>
+</div>
 
-<li>支持不同的目的端。
-通过 hook 实现。</li>
+<div id="outline-container-orgd24979d" class="outline-2">
+<h2 id="orgd24979d"><span class="section-number-2">5</span> 查询</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-org31cb421" class="outline-3">
+<h3 id="org31cb421"><span class="section-number-3">5.1</span> 单行</h3>
+<div class="outline-text-3" id="text-5-1">
+<div class="org-src-container">
+<pre class="src src-go"><span style="color: #00ffff; font-weight: bold;">var</span> <span style="color: #ffff00;">content</span> <span style="color: #00ff00;">string</span>
+<span style="color: #ffff00;">err</span> := db.<span style="color: #0000ff; font-weight: bold;">QueryRow</span>(<span style="color: #00ff00;">"select content from touch_rule where rule_id = ?"</span>, 1).<span style="color: #0000ff; font-weight: bold;">Scan</span>(&amp;content)
+<span style="color: #00ffff; font-weight: bold;">if</span> err != <span style="color: #ff00ff;">nil</span> {
+    log.<span style="color: #0000ff; font-weight: bold;">Fatal</span>(err)
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org51a39c3" class="outline-3">
+<h3 id="org51a39c3"><span class="section-number-3">5.2</span> 多行</h3>
+<div class="outline-text-3" id="text-5-2">
+<div class="org-src-container">
+<pre class="src src-go"><span style="color: #ffff00;">rows</span>, <span style="color: #ffff00;">err</span> := db.<span style="color: #0000ff; font-weight: bold;">Query</span>(<span style="color: #00ff00;">"select * from touch_rule;"</span>)
+<span style="color: #00ffff; font-weight: bold;">defer</span> rows.<span style="color: #0000ff; font-weight: bold;">Close</span>()
+
+<span style="color: #00ffff; font-weight: bold;">if</span> err != <span style="color: #ff00ff;">nil</span> {
+    log.<span style="color: #0000ff; font-weight: bold;">Fatal</span>(err)
+}
+
+<span style="color: #00ffff; font-weight: bold;">for</span> rows.<span style="color: #0000ff; font-weight: bold;">Next</span>() {
+    <span style="color: #00ffff; font-weight: bold;">var</span> <span style="color: #ffff00;">id</span> <span style="color: #00ff00;">uint32</span>
+    <span style="color: #00ffff; font-weight: bold;">var</span> <span style="color: #ffff00;">content</span> <span style="color: #00ff00;">string</span>
+    err = rows.<span style="color: #0000ff; font-weight: bold;">Scan</span>(&amp;id, &amp;content)
+    <span style="color: #00ffff; font-weight: bold;">if</span> err != <span style="color: #ff00ff;">nil</span> {
+        log.<span style="color: #0000ff; font-weight: bold;">Fatal</span>(err)
+    }
+    fmt.<span style="color: #0000ff; font-weight: bold;">Println</span>(id, content)
+}
+
+<span style="color: #00ffff; font-weight: bold;">if</span> err = rows.<span style="color: #0000ff; font-weight: bold;">Err</span>(); err != <span style="color: #ff00ff;">nil</span> {
+    log.<span style="color: #0000ff; font-weight: bold;">Fatal</span>(err)
+}
+</pre>
+</div>
+<p>
+有几点需要注意：
+</p>
+<ul class="org-ul">
+<li>检查遍历是否有 error</li>
+<li>defer rows.Close()非常重要。结果集 (rows) 未关闭前，底层的连接处于繁忙状态。当遍历读到最后一条记录时，会发生一个内部 EOF 错误，自动调用 rows.Close()，但是如果提前退出循环，rows 不会关闭，连接不会回到连接池中，连接也不会关闭。所以手动关闭非常重要。rows.Close()可以多次调用，是无害操作。</li>
 </ul>
 </div>
 </div>
+</div>
 
-<div id="outline-container-orgaf78211" class="outline-2">
-<h2 id="orgaf78211"><span class="section-number-2">3</span> 缺点</h2>
-<div class="outline-text-2" id="text-3">
-<ul class="org-ul">
-<li><p>
-不支持配置文件
-</p>
-
-<p>
-可以使用替代的解决方案 logrus_mate，但是该工具只支持 json 形式的文件。
-</p></li>
-
-<li><p>
-不支持对日志文件进行 rotate
-</p>
-
-<p>
-logrus 在 README 中明确说明如果需要对日志进行 rotate 操作，应由系统中的 logrotate(8) 命令进行，logrus 本身并不支持该操作。
-</p></li>
-
-<li><p>
-不支持文件名和行号。<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup>
-</p>
-
-<p>
-但是可以利用 runtime.Caller 进一步封装，runtime.Caller 可以得到调用者的 pc, 文件名, 文件行数, runtime.FuncForPC(pc).Name() 可以得到 pc 所在的函数名。
-</p>
+<div id="outline-container-org2271ce8" class="outline-2">
+<h2 id="org2271ce8"><span class="section-number-2">6</span> 事务</h2>
+<div class="outline-text-2" id="text-6">
 <div class="org-src-container">
 <pre class="src src-go">
 </pre>
-</div></li>
-</ul>
+</div>
 </div>
 </div>
 
-<div id="outline-container-org1168553" class="outline-2">
-<h2 id="org1168553"><span class="section-number-2">4</span> 示例</h2>
-<div class="outline-text-2" id="text-4">
-</div>
-<div id="outline-container-org3df9a4f" class="outline-3">
-<h3 id="org3df9a4f"><span class="section-number-3">4.1</span> 标准 logger</h3>
-<div class="outline-text-3" id="text-4-1">
+
+<div id="outline-container-org6e0c064" class="outline-2">
+<h2 id="org6e0c064"><span class="section-number-2">7</span> Null 处理</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+自定义了数据类型，比如，NullBool 表示该字段是 bool 类型，但是有可能设置为 null。简单说就是设计数据库的时候不要出现 null，处理起来非常费力。Null 的 type 很有限，例如没有 sql.NullUint64; null 值没有默认零值。
+</p>
 <div class="org-src-container">
-<pre class="src src-go"><span style="color: #00ffff; font-weight: bold;">func</span> <span style="color: #0000ff; font-weight: bold;">testLogrus</span>() {
-    logrus.<span style="color: #0000ff; font-weight: bold;">SetOutput</span>(os.Stdout)
-    logrus.<span style="color: #0000ff; font-weight: bold;">SetFormatter</span>(&amp;<span style="color: #00ff00;">logrus.JSONFormatter</span>{})
-    <span style="color: #ffff00;">// </span><span style="color: #ffff00;">logrus.SetFormatter(&amp;logrus.TextFormatter{})</span>
-    logrus.<span style="color: #0000ff; font-weight: bold;">SetLevel</span>(logrus.InfoLevel)
-    logrus.<span style="color: #0000ff; font-weight: bold;">Debug</span>(<span style="color: #00ff00;">"debug log"</span>)
-    logrus.<span style="color: #0000ff; font-weight: bold;">Info</span>(<span style="color: #00ff00;">"info log"</span>)
-    logrus.<span style="color: #0000ff; font-weight: bold;">Info</span>(<span style="color: #00ffff; font-weight: bold;">map</span>[<span style="color: #00ff00;">string</span>]<span style="color: #00ff00;">int</span>{<span style="color: #00ff00;">"age"</span>: 12})
+<pre class="src src-go"><span style="color: #00ffff; font-weight: bold;">var</span> <span style="color: #ffff00;">content</span> <span style="color: #00ff00;">sql.NullString</span>
+<span style="color: #ffff00;">err</span> := db.<span style="color: #0000ff; font-weight: bold;">QueryRow</span>(<span style="color: #00ff00;">"select content from touch_rule where rule_id = ?"</span>, 2).<span style="color: #0000ff; font-weight: bold;">Scan</span>(&amp;content)
+<span style="color: #00ffff; font-weight: bold;">if</span> err != <span style="color: #ff00ff;">nil</span> {
+    log.<span style="color: #0000ff; font-weight: bold;">Fatal</span>(err)
 }
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-org13bfe94" class="outline-3">
-<h3 id="org13bfe94"><span class="section-number-3">4.2</span> 自定义 logger</h3>
-<div class="outline-text-3" id="text-4-2">
-<div class="org-src-container">
-<pre class="src src-go"><span style="color: #00ffff; font-weight: bold;">func</span> <span style="color: #0000ff; font-weight: bold;">testLogger</span>() {
-    <span style="color: #ffff00;">logger</span> := &amp;<span style="color: #00ff00;">logrus.Logger</span>{
-        <span style="color: #ff00ff;">Out</span>:       os.Stdout,
-        <span style="color: #ff00ff;">Formatter</span>: <span style="color: #0000ff; font-weight: bold;">new</span>(<span style="color: #00ff00;">logrus.JSONFormatter</span>),
-        <span style="color: #ff00ff;">Level</span>:     logrus.DebugLevel,
-    }
-    logger.<span style="color: #0000ff; font-weight: bold;">Debug</span>(<span style="color: #00ff00;">"debug log"</span>)
-    logger.<span style="color: #0000ff; font-weight: bold;">Info</span>(<span style="color: #00ff00;">"info log"</span>)
-    logger.<span style="color: #0000ff; font-weight: bold;">Info</span>(<span style="color: #00ffff; font-weight: bold;">map</span>[<span style="color: #00ff00;">string</span>]<span style="color: #00ff00;">int</span>{<span style="color: #00ff00;">"age"</span>: 12})
-
-}
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-org46fd2ca" class="outline-3">
-<h3 id="org46fd2ca"><span class="section-number-3">4.3</span> entry</h3>
-<div class="outline-text-3" id="text-4-3">
-<div class="org-src-container">
-<pre class="src src-go"><span style="color: #00ffff; font-weight: bold;">func</span> <span style="color: #0000ff; font-weight: bold;">testEntry</span>() {
-    <span style="color: #ffff00;">logger</span> := &amp;<span style="color: #00ff00;">logrus.Logger</span>{
-        <span style="color: #ff00ff;">Out</span>:       os.Stdout,
-        <span style="color: #ff00ff;">Formatter</span>: <span style="color: #0000ff; font-weight: bold;">new</span>(<span style="color: #00ff00;">logrus.JSONFormatter</span>),
-        <span style="color: #ff00ff;">Level</span>:     logrus.DebugLevel,
-    }
-
-    <span style="color: #ffff00;">e</span> := logrus.<span style="color: #0000ff; font-weight: bold;">NewEntry</span>(logger)
-    e.<span style="color: #0000ff; font-weight: bold;">WithFields</span>(<span style="color: #00ff00;">logrus.Fields</span>{
-        <span style="color: #00ff00;">"name"</span>: <span style="color: #00ff00;">"lsl"</span>,
-        <span style="color: #00ff00;">"age"</span>:  30,
-    })
-
-    e.<span style="color: #0000ff; font-weight: bold;">Debug</span>(<span style="color: #00ff00;">"debug log"</span>)
-    e.<span style="color: #0000ff; font-weight: bold;">Info</span>(<span style="color: #00ff00;">"info log"</span>)
-    e.<span style="color: #0000ff; font-weight: bold;">Warn</span>(e.Level)
-}
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org9c29aab" class="outline-3">
-<h3 id="org9c29aab"><span class="section-number-3">4.4</span> hook</h3>
-<div class="outline-text-3" id="text-4-4">
-<div class="org-src-container">
-<pre class="src src-go"><span style="color: #00ffff; font-weight: bold;">func</span> <span style="color: #0000ff; font-weight: bold;">testHook</span>() {
-    <span style="color: #ffff00;">logger</span> := logrus.<span style="color: #0000ff; font-weight: bold;">New</span>()
-    <span style="color: #ffff00;">hook</span>, <span style="color: #ffff00;">err</span> := logrus_mail.<span style="color: #0000ff; font-weight: bold;">NewMailAuthHook</span>(<span style="color: #00ff00;">"APPLICATION_NAME"</span>, <span style="color: #00ff00;">"HOST"</span>, PORT, <span style="color: #00ff00;">"FROM"</span>, <span style="color: #00ff00;">"TO"</span>, <span style="color: #00ff00;">"USERNAME"</span>, <span style="color: #00ff00;">"PASSWORD"</span>)
-
-    <span style="color: #00ffff; font-weight: bold;">if</span> err != <span style="color: #ff00ff;">nil</span> {
-        logger.<span style="color: #0000ff; font-weight: bold;">Error</span>(<span style="color: #00ff00;">"init hook error"</span>)
-    }
-    logger.Hooks.<span style="color: #0000ff; font-weight: bold;">Add</span>(hook)
-
-    <span style="color: #ffff00;">e</span> := logger.<span style="color: #0000ff; font-weight: bold;">WithFields</span>(<span style="color: #00ff00;">logrus.Fields</span>{
-        <span style="color: #00ff00;">"content"</span>: <span style="color: #00ff00;">"test logrus hook"</span>,
-    })
-    <span style="color: #ffff00;">//</span><span style="color: #ffff00;">&#35774;&#32622;&#26102;&#38388;&#25139;&#21644; message</span>
-    e.<span style="color: #0000ff; font-weight: bold;">Error</span>(<span style="color: #00ff00;">"&#36825;&#26159;&#19968;&#20010; hook &#21457;&#26469;&#30340;&#37038;&#20214;"</span>)
-
-    <span style="color: #ffff00;">//</span><span style="color: #ffff00;">&#20351;&#29992; Fire &#21457;&#36865;,&#21253;&#21547;&#26102;&#38388;&#25139;&#65292;message</span>
-    hook.<span style="color: #0000ff; font-weight: bold;">Fire</span>(e)
-
+<span style="color: #00ffff; font-weight: bold;">if</span> content.Valid {
+    fmt.<span style="color: #0000ff; font-weight: bold;">Println</span>(content.String)
+} <span style="color: #00ffff; font-weight: bold;">else</span> {
+    fmt.<span style="color: #0000ff; font-weight: bold;">Println</span>(<span style="color: #00ff00;">"null"</span>)
 }
 </pre>
 </div>
 </div>
 </div>
 </div>
-
-<div id="outline-container-orgb9f158f" class="outline-2">
-<h2 id="orgb9f158f"><span class="section-number-2">5</span> 注意事项</h2>
-</div>
-<div id="footnotes">
-<h2 class="footnotes">Footnotes: </h2>
-<div id="text-footnotes">
-
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <div class="footpara"><p class="footpara">
-<a href="https://github.com/sirupsen/logrus/issues/63">Log filename and line number</a>
-</p></div></div>
-
-
-</div>
-</div></div>
 <div id="postamble" class="status">
 <p class="author">Author: 刘尚亮</p>
 <p class="email">Email: <a href="mailto:phenix3443@gmail.com">phenix3443@gmail.com</a></p>

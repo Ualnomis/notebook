@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-04-26 日 10:55 -->
+<!-- 2020-10-12 Mon 19:40 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>golang 测试框架</title>
+<title>golang</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="刘尚亮" />
 <style type="text/css">
@@ -306,49 +306,119 @@ for the JavaScript code in this tag.
  |
  <a accesskey="H" href="https://phenix3443.github.io/"> HOME </a>
 </div><div id="content">
-<h1 class="title">golang 测试框架</h1>
+<h1 class="title">golang</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org7dbf2e4">1. 概述</a></li>
-<li><a href="#org5f80f8d">2. testing</a></li>
-<li><a href="#org654828a">3. gotest</a></li>
-<li><a href="#orgab0eefc">4. gocheck</a></li>
-<li><a href="#org579270a">5. gunit</a></li>
-<li><a href="#org6d7a704">6. ginkgo</a></li>
+<li><a href="#orgc6f70a6">1. 概述</a></li>
+<li><a href="#org85b2964">2. 测试框架</a>
+<ul>
+<li><a href="#orgced0ab0">2.1. testing</a></li>
+<li><a href="#orgd6ac5f4">2.2. gotests</a></li>
+<li><a href="#orgf35506a">2.3. gocheck</a></li>
+<li><a href="#org796dc98">2.4. gunit</a></li>
+<li><a href="#orgd941923">2.5. ginkgo</a></li>
+<li><a href="#org9fd682a">2.6. gomock</a></li>
+<li><a href="#org7b20351">2.7. mockery</a></li>
+<li><a href="#org7adae06">2.8. testify</a></li>
+<li><a href="#org9d97dcc">2.9. monkey</a></li>
+</ul>
+</li>
+<li><a href="#org6029177">3. 参考文章</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org7dbf2e4" class="outline-2">
-<h2 id="org7dbf2e4"><span class="section-number-2">1</span> 概述</h2>
+<div id="outline-container-orgc6f70a6" class="outline-2">
+<h2 id="orgc6f70a6"><span class="section-number-2">1</span> 概述</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+测试情景：
+</p>
+<ul class="org-ul">
+<li>local function</li>
+<li>package function</li>
+<li>interface</li>
+<li>struct method</li>
+</ul>
+
+
+<p>
+测试方法：
+</p>
+<ul class="org-ul">
+<li>子测试(subtests)</li>
+<li>表格驱动测试(table-driven tests)</li>
+<li>帮助函数(helpers)</li>
+<li>网络测试和基准测试(Benchmark)</li>
+</ul>
+
+<p>
+如何编写可测试的代码：
+</p>
+<ul class="org-ul">
+<li>使用 interface？</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org85b2964" class="outline-2">
+<h2 id="org85b2964"><span class="section-number-2">2</span> 测试框架</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgced0ab0" class="outline-3">
+<h3 id="orgced0ab0"><span class="section-number-3">2.1</span> testing</h3>
+</div>
+<div id="outline-container-orgd6ac5f4" class="outline-3">
+<h3 id="orgd6ac5f4"><span class="section-number-3">2.2</span> gotests</h3>
+</div>
+<div id="outline-container-orgf35506a" class="outline-3">
+<h3 id="orgf35506a"><span class="section-number-3">2.3</span> gocheck</h3>
+</div>
+<div id="outline-container-org796dc98" class="outline-3">
+<h3 id="org796dc98"><span class="section-number-3">2.4</span> gunit</h3>
+</div>
+<div id="outline-container-orgd941923" class="outline-3">
+<h3 id="orgd941923"><span class="section-number-3">2.5</span> ginkgo</h3>
+</div>
+<div id="outline-container-org9fd682a" class="outline-3">
+<h3 id="org9fd682a"><span class="section-number-3">2.6</span> gomock</h3>
+<div class="outline-text-3" id="text-2-6">
+<p>
+<a href="https://godoc.org/github.com/golang/mock/gomock">gomock</a> 似乎是和 interface 有关？
+</p>
+</div>
+</div>
+<div id="outline-container-org7b20351" class="outline-3">
+<h3 id="org7b20351"><span class="section-number-3">2.7</span> mockery</h3>
+<div class="outline-text-3" id="text-2-7">
+<p>
+<a href="https://github.com/vektra/mockery">mockery</a>
+</p>
+</div>
+</div>
+<div id="outline-container-org7adae06" class="outline-3">
+<h3 id="org7adae06"><span class="section-number-3">2.8</span> testify</h3>
+</div>
+<div id="outline-container-org9d97dcc" class="outline-3">
+<h3 id="org9d97dcc"><span class="section-number-3">2.9</span> monkey</h3>
+<div class="outline-text-3" id="text-2-9">
+<p>
+<a href="https://github.com/bouk/monkey">monkey</a>
+</p>
+</div>
+</div>
 </div>
 
-<div id="outline-container-org5f80f8d" class="outline-2">
-<h2 id="org5f80f8d"><span class="section-number-2">2</span> testing</h2>
-</div>
 
-<div id="outline-container-org654828a" class="outline-2">
-<h2 id="org654828a"><span class="section-number-2">3</span> gotest</h2>
-</div>
-
-<div id="outline-container-orgab0eefc" class="outline-2">
-<h2 id="orgab0eefc"><span class="section-number-2">4</span> gocheck</h2>
-</div>
-
-<div id="outline-container-org579270a" class="outline-2">
-<h2 id="org579270a"><span class="section-number-2">5</span> gunit</h2>
-</div>
-
-<div id="outline-container-org6d7a704" class="outline-2">
-<h2 id="org6d7a704"><span class="section-number-2">6</span> ginkgo</h2>
+<div id="outline-container-org6029177" class="outline-2">
+<h2 id="org6029177"><span class="section-number-2">3</span> 参考文章</h2>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: 刘尚亮</p>
 <p class="email">Email: <a href="mailto:phenix3443@gmail.com">phenix3443@gmail.com</a></p>
-<p class="date">Created: 2020-04-26 日 10:55</p>
+<p class="date">Created: 2020-10-12 Mon 19:40</p>
 <p class="validation"></p>
 </div>
 </body>

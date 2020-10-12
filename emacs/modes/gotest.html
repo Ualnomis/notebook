@@ -3,12 +3,12 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-12 Mon 19:40 -->
+<!-- 2020-10-12 Mon 19:41 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>logrus</title>
+<title>gotest</title>
 <meta name="generator" content="Org mode" />
-<meta name="author" content="刘尚亮" />
+<meta name="author" content="liushangliang" />
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
   .title  { text-align: center;
@@ -306,204 +306,105 @@ for the JavaScript code in this tag.
  |
  <a accesskey="H" href="https://phenix3443.github.io/"> HOME </a>
 </div><div id="content">
-<h1 class="title">logrus</h1>
+<h1 class="title">gotest</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org7489f05">1. 简介</a></li>
-<li><a href="#orgee79bae">2. 优点</a></li>
-<li><a href="#orgaf78211">3. 缺点</a></li>
-<li><a href="#org1168553">4. 示例</a>
-<ul>
-<li><a href="#org3df9a4f">4.1. 标准 logger</a></li>
-<li><a href="#org13bfe94">4.2. 自定义 logger</a></li>
-<li><a href="#org46fd2ca">4.3. entry</a></li>
-<li><a href="#org9c29aab">4.4. hook</a></li>
-</ul>
-</li>
-<li><a href="#orgb9f158f">5. 注意事项</a></li>
+<li><a href="#orge6fbcc8">1. 概述</a></li>
+<li><a href="#org63b1d9f">2. 使用</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org7489f05" class="outline-2">
-<h2 id="org7489f05"><span class="section-number-2">1</span> 简介</h2>
+<div id="outline-container-orge6fbcc8" class="outline-2">
+<h2 id="orge6fbcc8"><span class="section-number-2">1</span> 概述</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-logrus 是一个日志记录工具，核心思想是日志的记录应该是结构化的，而只是记录一个字符串。
+<a href="https://github.com/nlamirault/gotest.el">gotest</a> 可以直接从 Emacs 中运行 <code>go test</code> 。
 </p>
 </div>
 </div>
 
-<div id="outline-container-orgee79bae" class="outline-2">
-<h2 id="orgee79bae"><span class="section-number-2">2</span> 优点</h2>
+<div id="outline-container-org63b1d9f" class="outline-2">
+<h2 id="org63b1d9f"><span class="section-number-2">2</span> 使用</h2>
 <div class="outline-text-2" id="text-2">
+<p>
+有很多命令可以从多角度运行命令。
+</p>
+
 <ul class="org-ul">
 <li><p>
-线程安全
+go-test-current-test
 </p>
 
 <p>
-通过 sync.Mutex 的方式每次对 Logger 进行加锁，获得锁后写入单条日志，然后释放锁。
+Launch unit tests for the current test.
 </p></li>
 
-<li>支持不同的日志等级。</li>
+<li><p>
+go-test-current-test-cache
+</p>
 
-<li>支持不同的目的端。
-通过 hook 实现。</li>
+<p>
+Rerun the current test.
+</p></li>
+
+<li><p>
+go-test-current-file
+</p>
+
+<p>
+Launch unit tests and examples for the current file
+</p></li>
+
+<li><p>
+go-test-current-project
+</p>
+
+<p>
+Launch unit tests and examples for the current project.
+</p></li>
+
+<li><p>
+go-test-current-coverage
+</p>
+
+<p>
+Launch unit tests coverage for the current project.
+</p></li>
+
+<li><p>
+go-test-current-benchmark
+</p>
+
+<p>
+Launch go benchmark on current benchmark
+</p></li>
+
+<li><p>
+go-test-current-file-benchmarks
+</p>
+
+<p>
+Launch go benchmark on current file
+</p></li>
+
+<li><p>
+go-test-current-project-benchmarks
+</p>
+
+<p>
+Launch go benchmark on current project
+</p></li>
 </ul>
 </div>
 </div>
-
-<div id="outline-container-orgaf78211" class="outline-2">
-<h2 id="orgaf78211"><span class="section-number-2">3</span> 缺点</h2>
-<div class="outline-text-2" id="text-3">
-<ul class="org-ul">
-<li><p>
-不支持配置文件
-</p>
-
-<p>
-可以使用替代的解决方案 logrus_mate，但是该工具只支持 json 形式的文件。
-</p></li>
-
-<li><p>
-不支持对日志文件进行 rotate
-</p>
-
-<p>
-logrus 在 README 中明确说明如果需要对日志进行 rotate 操作，应由系统中的 logrotate(8) 命令进行，logrus 本身并不支持该操作。
-</p></li>
-
-<li><p>
-不支持文件名和行号。<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup>
-</p>
-
-<p>
-但是可以利用 runtime.Caller 进一步封装，runtime.Caller 可以得到调用者的 pc, 文件名, 文件行数, runtime.FuncForPC(pc).Name() 可以得到 pc 所在的函数名。
-</p>
-<div class="org-src-container">
-<pre class="src src-go">
-</pre>
-</div></li>
-</ul>
 </div>
-</div>
-
-<div id="outline-container-org1168553" class="outline-2">
-<h2 id="org1168553"><span class="section-number-2">4</span> 示例</h2>
-<div class="outline-text-2" id="text-4">
-</div>
-<div id="outline-container-org3df9a4f" class="outline-3">
-<h3 id="org3df9a4f"><span class="section-number-3">4.1</span> 标准 logger</h3>
-<div class="outline-text-3" id="text-4-1">
-<div class="org-src-container">
-<pre class="src src-go"><span style="color: #00ffff; font-weight: bold;">func</span> <span style="color: #0000ff; font-weight: bold;">testLogrus</span>() {
-    logrus.<span style="color: #0000ff; font-weight: bold;">SetOutput</span>(os.Stdout)
-    logrus.<span style="color: #0000ff; font-weight: bold;">SetFormatter</span>(&amp;<span style="color: #00ff00;">logrus.JSONFormatter</span>{})
-    <span style="color: #ffff00;">// </span><span style="color: #ffff00;">logrus.SetFormatter(&amp;logrus.TextFormatter{})</span>
-    logrus.<span style="color: #0000ff; font-weight: bold;">SetLevel</span>(logrus.InfoLevel)
-    logrus.<span style="color: #0000ff; font-weight: bold;">Debug</span>(<span style="color: #00ff00;">"debug log"</span>)
-    logrus.<span style="color: #0000ff; font-weight: bold;">Info</span>(<span style="color: #00ff00;">"info log"</span>)
-    logrus.<span style="color: #0000ff; font-weight: bold;">Info</span>(<span style="color: #00ffff; font-weight: bold;">map</span>[<span style="color: #00ff00;">string</span>]<span style="color: #00ff00;">int</span>{<span style="color: #00ff00;">"age"</span>: 12})
-}
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-org13bfe94" class="outline-3">
-<h3 id="org13bfe94"><span class="section-number-3">4.2</span> 自定义 logger</h3>
-<div class="outline-text-3" id="text-4-2">
-<div class="org-src-container">
-<pre class="src src-go"><span style="color: #00ffff; font-weight: bold;">func</span> <span style="color: #0000ff; font-weight: bold;">testLogger</span>() {
-    <span style="color: #ffff00;">logger</span> := &amp;<span style="color: #00ff00;">logrus.Logger</span>{
-        <span style="color: #ff00ff;">Out</span>:       os.Stdout,
-        <span style="color: #ff00ff;">Formatter</span>: <span style="color: #0000ff; font-weight: bold;">new</span>(<span style="color: #00ff00;">logrus.JSONFormatter</span>),
-        <span style="color: #ff00ff;">Level</span>:     logrus.DebugLevel,
-    }
-    logger.<span style="color: #0000ff; font-weight: bold;">Debug</span>(<span style="color: #00ff00;">"debug log"</span>)
-    logger.<span style="color: #0000ff; font-weight: bold;">Info</span>(<span style="color: #00ff00;">"info log"</span>)
-    logger.<span style="color: #0000ff; font-weight: bold;">Info</span>(<span style="color: #00ffff; font-weight: bold;">map</span>[<span style="color: #00ff00;">string</span>]<span style="color: #00ff00;">int</span>{<span style="color: #00ff00;">"age"</span>: 12})
-
-}
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-org46fd2ca" class="outline-3">
-<h3 id="org46fd2ca"><span class="section-number-3">4.3</span> entry</h3>
-<div class="outline-text-3" id="text-4-3">
-<div class="org-src-container">
-<pre class="src src-go"><span style="color: #00ffff; font-weight: bold;">func</span> <span style="color: #0000ff; font-weight: bold;">testEntry</span>() {
-    <span style="color: #ffff00;">logger</span> := &amp;<span style="color: #00ff00;">logrus.Logger</span>{
-        <span style="color: #ff00ff;">Out</span>:       os.Stdout,
-        <span style="color: #ff00ff;">Formatter</span>: <span style="color: #0000ff; font-weight: bold;">new</span>(<span style="color: #00ff00;">logrus.JSONFormatter</span>),
-        <span style="color: #ff00ff;">Level</span>:     logrus.DebugLevel,
-    }
-
-    <span style="color: #ffff00;">e</span> := logrus.<span style="color: #0000ff; font-weight: bold;">NewEntry</span>(logger)
-    e.<span style="color: #0000ff; font-weight: bold;">WithFields</span>(<span style="color: #00ff00;">logrus.Fields</span>{
-        <span style="color: #00ff00;">"name"</span>: <span style="color: #00ff00;">"lsl"</span>,
-        <span style="color: #00ff00;">"age"</span>:  30,
-    })
-
-    e.<span style="color: #0000ff; font-weight: bold;">Debug</span>(<span style="color: #00ff00;">"debug log"</span>)
-    e.<span style="color: #0000ff; font-weight: bold;">Info</span>(<span style="color: #00ff00;">"info log"</span>)
-    e.<span style="color: #0000ff; font-weight: bold;">Warn</span>(e.Level)
-}
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org9c29aab" class="outline-3">
-<h3 id="org9c29aab"><span class="section-number-3">4.4</span> hook</h3>
-<div class="outline-text-3" id="text-4-4">
-<div class="org-src-container">
-<pre class="src src-go"><span style="color: #00ffff; font-weight: bold;">func</span> <span style="color: #0000ff; font-weight: bold;">testHook</span>() {
-    <span style="color: #ffff00;">logger</span> := logrus.<span style="color: #0000ff; font-weight: bold;">New</span>()
-    <span style="color: #ffff00;">hook</span>, <span style="color: #ffff00;">err</span> := logrus_mail.<span style="color: #0000ff; font-weight: bold;">NewMailAuthHook</span>(<span style="color: #00ff00;">"APPLICATION_NAME"</span>, <span style="color: #00ff00;">"HOST"</span>, PORT, <span style="color: #00ff00;">"FROM"</span>, <span style="color: #00ff00;">"TO"</span>, <span style="color: #00ff00;">"USERNAME"</span>, <span style="color: #00ff00;">"PASSWORD"</span>)
-
-    <span style="color: #00ffff; font-weight: bold;">if</span> err != <span style="color: #ff00ff;">nil</span> {
-        logger.<span style="color: #0000ff; font-weight: bold;">Error</span>(<span style="color: #00ff00;">"init hook error"</span>)
-    }
-    logger.Hooks.<span style="color: #0000ff; font-weight: bold;">Add</span>(hook)
-
-    <span style="color: #ffff00;">e</span> := logger.<span style="color: #0000ff; font-weight: bold;">WithFields</span>(<span style="color: #00ff00;">logrus.Fields</span>{
-        <span style="color: #00ff00;">"content"</span>: <span style="color: #00ff00;">"test logrus hook"</span>,
-    })
-    <span style="color: #ffff00;">//</span><span style="color: #ffff00;">&#35774;&#32622;&#26102;&#38388;&#25139;&#21644; message</span>
-    e.<span style="color: #0000ff; font-weight: bold;">Error</span>(<span style="color: #00ff00;">"&#36825;&#26159;&#19968;&#20010; hook &#21457;&#26469;&#30340;&#37038;&#20214;"</span>)
-
-    <span style="color: #ffff00;">//</span><span style="color: #ffff00;">&#20351;&#29992; Fire &#21457;&#36865;,&#21253;&#21547;&#26102;&#38388;&#25139;&#65292;message</span>
-    hook.<span style="color: #0000ff; font-weight: bold;">Fire</span>(e)
-
-}
-</pre>
-</div>
-</div>
-</div>
-</div>
-
-<div id="outline-container-orgb9f158f" class="outline-2">
-<h2 id="orgb9f158f"><span class="section-number-2">5</span> 注意事项</h2>
-</div>
-<div id="footnotes">
-<h2 class="footnotes">Footnotes: </h2>
-<div id="text-footnotes">
-
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <div class="footpara"><p class="footpara">
-<a href="https://github.com/sirupsen/logrus/issues/63">Log filename and line number</a>
-</p></div></div>
-
-
-</div>
-</div></div>
 <div id="postamble" class="status">
-<p class="author">Author: 刘尚亮</p>
-<p class="email">Email: <a href="mailto:phenix3443@gmail.com">phenix3443@gmail.com</a></p>
-<p class="date">Created: 2020-10-12 Mon 19:40</p>
+<p class="author">Author: liushangliang</p>
+<p class="email">Email: <a href="mailto:phenix3443+github@gmail.com">phenix3443+github@gmail.com</a></p>
+<p class="date">Created: 2020-10-12 Mon 19:41</p>
 <p class="validation"></p>
 </div>
 </body>

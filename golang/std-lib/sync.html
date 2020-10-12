@@ -3,12 +3,12 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-04-26 日 10:55 -->
+<!-- 2020-10-12 Mon 19:40 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>sync</title>
 <meta name="generator" content="Org mode" />
-<meta name="author" content="刘尚亮" />
+<meta name="author" content="liushangliang" />
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
   .title  { text-align: center;
@@ -311,18 +311,18 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9faf3ee">1. 概述</a></li>
-<li><a href="#org582178c">2. once</a></li>
-<li><a href="#org5f8ef9c">3. waitgroup</a></li>
+<li><a href="#orga5f2363">1. 概述</a></li>
+<li><a href="#orgfa1de26">2. once</a></li>
+<li><a href="#org4cf77e8">3. waitgroup</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org9faf3ee" class="outline-2">
-<h2 id="org9faf3ee"><span class="section-number-2">1</span> 概述</h2>
+<div id="outline-container-orga5f2363" class="outline-2">
+<h2 id="orga5f2363"><span class="section-number-2">1</span> 概述</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-sync 包提供基本的同步原语，如互斥锁。除了 Once 和 WaitGroup 类型之外，大多数类型都是供低级库例程使用的。更高层的同步最好通过 channel 和 communication 来完成。
+<a href="https://golang.org/pkg/sync/">sync</a> 包提供基本的同步原语，如互斥锁。除了 Once 和 WaitGroup 类型之外，大多数类型都是供低级库例程使用的。更高层的同步最好通过 channel 和 communication 来完成。
 </p>
 
 <p>
@@ -331,12 +331,12 @@ sync 包提供基本的同步原语，如互斥锁。除了 Once 和 WaitGroup �
 </div>
 </div>
 
-<div id="outline-container-org582178c" class="outline-2">
-<h2 id="org582178c"><span class="section-number-2">2</span> once</h2>
+<div id="outline-container-orgfa1de26" class="outline-2">
+<h2 id="orgfa1de26"><span class="section-number-2">2</span> once</h2>
 </div>
 
-<div id="outline-container-org5f8ef9c" class="outline-2">
-<h2 id="org5f8ef9c"><span class="section-number-2">3</span> waitgroup</h2>
+<div id="outline-container-org4cf77e8" class="outline-2">
+<h2 id="org4cf77e8"><span class="section-number-2">3</span> waitgroup</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 WaitGroup 等待一系列 goroutine 完成。主 goroutine 调用 Add 来设置要等待的 goroutines 的数量。然后，每个 goroutine 运行并在完成后调用 Done。同时，Wait 可以用来阻塞，直到所有的 goroutines 都完成了。
@@ -345,9 +345,9 @@ WaitGroup 等待一系列 goroutine 完成。主 goroutine 调用 Add 来设置�
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Author: 刘尚亮</p>
-<p class="email">Email: <a href="mailto:phenix3443@gmail.com">phenix3443@gmail.com</a></p>
-<p class="date">Created: 2020-04-26 日 10:55</p>
+<p class="author">Author: liushangliang</p>
+<p class="email">Email: <a href="mailto:phenix3443+github@gmail.com">phenix3443+github@gmail.com</a></p>
+<p class="date">Created: 2020-10-12 Mon 19:40</p>
 <p class="validation"></p>
 </div>
 </body>
